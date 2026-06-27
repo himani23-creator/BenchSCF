@@ -1,0 +1,68 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# BenchSCF — Master Configuration
+# One command: python run_benchmark.py --config config.yaml
+# All seeds fixed → deterministic reproduction on any machine.
+# ──────────────────────────────────────────────────────────────────────────────
+
+seed: 42
+
+# ── Evaluation Protocol ───────────────────────────────────────────────────────
+cv_folds: 5            # 5-fold rolling-origin cross-validation
+horizon: 4             # 4-week forecast horizon
+train_ratio: 0.70      # 70% train, 10% val, 20% test (chronological)
+
+# ── Datasets ──────────────────────────────────────────────────────────────────
+datasets:
+  dataco:
+    enabled: true
+    file_path: data/raw/DataCoSupplyChainDataset.csv
+    n_sample_series: 20        # ~120 total series; sample for speed
+
+  rossmann:
+    enabled: true
+    train_path: data/raw/rossmann_train.csv
+    store_path: data/raw/rossmann_store.csv
+    n_stores: 100              # stratified sample by StoreType
+    n_sample_series: 20
+
+# ── Models ────────────────────────────────────────────────────────────────────
+models:
+  sarima:
+    enabled: true
+    order: [1, 1, 1]
+    seasonal_order: [1, 1, 0, 52]
+
+  ets:
+    enabled: true
+    trend: "add"
+    seasonal: "add"
+    seasonal_periods: 52
+
+  prophet:
+    enabled: true
+    yearly_seasonality: true
+    weekly_seasonality: true
+    daily_seasonality: false
+    changepoint_prior_scale: 0.05
+
+  xgboost:
+    enabled: true
+    n_lags: 12
+    rolling_windows: [4, 8]
+    n_estimators: 200
+    max_depth: 5
+    learning_rate: 0.05
+
+  lstm:
+    enabled: true
+    look_back: 12
+    lstm_units: 64
+    epochs: 50
+    batch_size: 16
+    patience: 5
+
+# ── Output ────────────────────────────────────────────────────────────────────
+output:
+  results_dir: results/
+  save_json: true
+  save_csv: true
