@@ -3,7 +3,7 @@ import { Play, Square, RefreshCw, Database, Cpu, Settings2, Terminal, ChevronRig
 import ResultsTable from '../components/ResultsTable.jsx'
 import ComparisonChart from '../components/ComparisonChart.jsx'
 
-const API_BASE = '/api'
+const API_BASE = (import.meta.env.VITE_API_BASE || '/api').replace(/\/$/, '')
 
 const DATASETS = [
   {

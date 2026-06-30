@@ -75,6 +75,24 @@ npm run dev
 
 Open http://localhost:5173
 
+## Deploy to Render + Vercel
+
+### Backend on Render
+1. Create a new Web Service in Render.
+2. Connect this repository and set the root directory to `backend`.
+3. Render will use [backend/render.yaml](backend/render.yaml) to install dependencies and start the FastAPI app with Uvicorn.
+4. The backend will be available at the Render URL, for example `https://your-app.onrender.com`.
+
+### Frontend on Vercel
+1. Create a new Vercel project.
+2. Connect this repository and set the root directory to `frontend`.
+3. Add the environment variable `VITE_API_BASE=https://your-render-url.onrender.com`.
+4. Deploy the project.
+
+### Notes
+- The frontend reads the API base from the `VITE_API_BASE` environment variable.
+- The backend currently stores benchmark runs in memory, so a restart will clear existing run history.
+
 ## Evaluation Protocol
 
 - **Split**: 70% train / 10% val / 20% test — chronological, no shuffle

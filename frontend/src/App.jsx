@@ -4,7 +4,7 @@ import { Activity, BarChart3, Home, Cpu, Zap } from 'lucide-react'
 import HomePage from './pages/Home.jsx'
 import ResultsPage from './pages/Results.jsx'
 
-const API_BASE = '/api'
+const API_BASE = (import.meta.env.VITE_API_BASE || '/api').replace(/\/$/, '')
 
 function Navbar({ apiStatus }) {
   return (

@@ -3,7 +3,7 @@ import { BarChart3, RefreshCw, Download, Clock, CheckCircle2, AlertCircle, Loade
 import ResultsTable from '../components/ResultsTable.jsx'
 import ComparisonChart from '../components/ComparisonChart.jsx'
 
-const API_BASE = '/api'
+const API_BASE = (import.meta.env.VITE_API_BASE || '/api').replace(/\/$/, '')
 
 const MODELS = [
   { id: 'sarima',   name: 'SARIMA',           family: 'Classical Statistical',  lib: 'statsmodels',    color: '#00e5ff' },
