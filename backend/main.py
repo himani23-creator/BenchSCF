@@ -86,6 +86,12 @@ def load_base_config() -> dict:
     return {}
 
 
+def resolve_backend_path(path: str) -> str:
+    if os.path.isabs(path):
+        return path
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), path))
+
+
 def run_benchmark_task(run_id: str, config: BenchmarkConfig):
     """
     Background task: runs the full benchmark and stores results.
@@ -181,15 +187,18 @@ def run_benchmark_task(run_id: str, config: BenchmarkConfig):
 def _load_dataset(name: str, cfg: dict, seed: int):
     if name == "dataco":
         from data.dataco_adapter import DataCoAdapter
-        adapter = DataCoAdapter(file_path=cfg.get("file_path", "data/raw/DataCoSupplyChainDataset.csv"), seed=seed)
+        adapter = DataCoAdapter(
+            file_path=resolve_backend_path(cfg.get("file_path", "data/raw/DataCoSupplyChainDataset.csv")),
+            seed=seed,
+        )
         adapter.load()
         keys = adapter.get_sample_keys(n=cfg.get("n_sample_series", 10))
         return adapter, keys
     elif name == "rossmann":
         from data.rossmann_adapter import RossmannAdapter
         adapter = RossmannAdapter(
-            train_path=cfg.get("train_path", "data/raw/rossmann_train.csv"),
-            store_path=cfg.get("store_path", "data/raw/rossmann_store.csv"),
+            train_path=resolve_backend_path(cfg.get("train_path", "data/raw/rossmann_train.csv")),
+            store_path=resolve_backend_path(cfg.get("store_path", "data/raw/rossmann_store.csv")),
             seed=seed,
             n_stores=cfg.get("n_stores", 100),
         )
