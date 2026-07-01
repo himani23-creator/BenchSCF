@@ -60,8 +60,8 @@ class RossmannAdapter:
 
         for store_id, grp in weekly.groupby("Store"):
             series = grp.set_index("week")["Sales"].sort_index()
-            full_index = pd.date_range(series.index.min(), series.index.max(), freq="W")
-            series = series.reindex(full_index, fill_value=0)
+            # Don't reindex to full date range — just use actual data points
+            # Only keep series with enough observations
             if len(series) >= 52:
                 key = f"store_{store_id}"
                 self._series_map[key] = series

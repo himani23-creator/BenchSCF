@@ -25,6 +25,10 @@ class ProphetForecaster(BaseForecaster):
     def fit(self, y_train: np.ndarray) -> None:
         from prophet import Prophet
 
+        # Remove any NaN values
+        y_train = np.array(y_train, dtype=float)
+        y_train = y_train[~np.isnan(y_train)]
+
         # Prophet requires a DataFrame with 'ds' and 'y' columns
         # Generate weekly date range for the training series
         dates = pd.date_range(end="2018-12-31", periods=len(y_train), freq="W")
@@ -50,6 +54,9 @@ class ProphetForecaster(BaseForecaster):
         forecast = self.model.predict(future)
         # Return only the future horizon predictions
         preds = forecast["yhat"].values[-horizon:]
+        preds = np.array(preds, dtype=float)
+        # Handle NaN values
+        preds = np.nan_to_num(preds, nan=0.0)
         return np.clip(preds, 0, None)
 
     def get_params(self) -> dict:

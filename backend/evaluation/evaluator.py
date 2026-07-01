@@ -12,13 +12,21 @@ def compute_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> Dict[str, float]:
     """
     y_true = np.array(y_true, dtype=float)
     y_pred = np.array(y_pred, dtype=float)
+    
+    # Remove NaN values
+    mask = ~(np.isnan(y_true) | np.isnan(y_pred))
+    if not mask.any():
+        return {"MAE": np.nan, "RMSE": np.nan, "MAPE": np.nan, "R2": np.nan}
+    
+    y_true = y_true[mask]
+    y_pred = y_pred[mask]
 
     mae = np.mean(np.abs(y_true - y_pred))
     rmse = np.sqrt(np.mean((y_true - y_pred) ** 2))
 
     # MAPE: avoid division by zero
-    mask = np.abs(y_true) > 1e-8
-    mape = np.mean(np.abs((y_true[mask] - y_pred[mask]) / y_true[mask])) * 100 if mask.any() else np.nan
+    mask_nonzero = np.abs(y_true) > 1e-8
+    mape = np.mean(np.abs((y_true[mask_nonzero] - y_pred[mask_nonzero]) / y_true[mask_nonzero])) * 100 if mask_nonzero.any() else np.nan
 
     # R²
     ss_res = np.sum((y_true - y_pred) ** 2)
@@ -62,6 +70,13 @@ class RollingOriginEvaluator:
         Returns:
             Dict with metrics as keys, each containing 'mean' and 'std' across folds.
         """
+        # Remove any NaN values from the series
+        full_series = np.array(full_series, dtype=float)
+        full_series = full_series[~np.isnan(full_series)]
+        
+        if len(full_series) < 52:
+            return {m: {"mean": np.nan, "std": np.nan} for m in ["MAE", "RMSE", "MAPE", "R2"]}
+        
         n = len(full_series)
         initial_train_end = int(n * train_ratio)
 
@@ -154,12 +169,13 @@ class BenchmarkRunner:
                 y_train_norm, _, y_test_norm, norm_mean, norm_std = adapter.get_train_val_test(
                     key, train_ratio=self.train_ratio
                 )
-                # Full series for rolling-origin CV
-                full_series = np.concatenate([
-                    y_train_norm * norm_std + norm_mean,
-                ])
                 # Use raw (unnormalised) series — evaluator handles per-fold normalisation
                 raw_series = adapter._series_map[key].values.astype(float)
+                # Remove any NaN values from the series
+                raw_series = raw_series[~np.isnan(raw_series)]
+                
+                if len(raw_series) < 52:
+                    continue  # Skip series that are too short
 
                 fold_metrics = self.evaluator.run(
                     model_class, model_params, raw_series, self.train_ratio

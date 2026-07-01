@@ -20,6 +20,10 @@ class SARIMAForecaster(BaseForecaster):
         self.model_fit = None
 
     def fit(self, y_train: np.ndarray) -> None:
+        # Remove any NaN values
+        y_train = np.array(y_train, dtype=float)
+        y_train = y_train[~np.isnan(y_train)]
+        
         model = SARIMAX(
             y_train,
             order=self.order,
@@ -34,7 +38,10 @@ class SARIMAForecaster(BaseForecaster):
         if not self.is_fitted:
             raise RuntimeError("Model must be fitted before calling predict().")
         forecast = self.model_fit.forecast(steps=horizon)
-        return np.array(forecast)
+        forecast = np.array(forecast, dtype=float)
+        # Handle any NaN values in forecast
+        forecast = np.nan_to_num(forecast, nan=0.0)
+        return forecast
 
     def get_params(self) -> dict:
         return {

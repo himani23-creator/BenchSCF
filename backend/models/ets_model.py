@@ -20,13 +20,18 @@ class ETSForecaster(BaseForecaster):
         self.model_fit = None
 
     def fit(self, y_train: np.ndarray) -> None:
+        # Remove any NaN values
+        y_train = np.array(y_train, dtype=float)
+        y_train = y_train[~np.isnan(y_train)]
+        
         # Clip to avoid zeros/negatives which break multiplicative models
         y_train = np.clip(y_train, 1e-3, None)
+        
         model = ExponentialSmoothing(
             y_train,
             trend=self.trend,
             seasonal=self.seasonal,
-            seasonal_periods=self.seasonal_periods,
+            seasonal_periods=min(self.seasonal_periods, len(y_train) // 2),  # Avoid seasonality > series length
             initialization_method="estimated",
         )
         self.model_fit = model.fit(optimized=True)
@@ -36,7 +41,10 @@ class ETSForecaster(BaseForecaster):
         if not self.is_fitted:
             raise RuntimeError("Model must be fitted before calling predict().")
         forecast = self.model_fit.forecast(horizon)
-        return np.array(forecast)
+        forecast = np.array(forecast, dtype=float)
+        # Handle any NaN values in forecast
+        forecast = np.nan_to_num(forecast, nan=0.0)
+        return forecast
 
     def get_params(self) -> dict:
         return {

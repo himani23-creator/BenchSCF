@@ -39,6 +39,10 @@ class XGBoostForecaster(BaseForecaster):
         return df
 
     def fit(self, y_train: np.ndarray) -> None:
+        # Remove any NaN values
+        y_train = np.array(y_train, dtype=float)
+        y_train = y_train[~np.isnan(y_train)]
+        
         df = self._build_features(y_train)
         X = df.drop(columns=["y"]).values
         y = df["y"].values
@@ -80,6 +84,8 @@ class XGBoostForecaster(BaseForecaster):
         for _ in range(horizon):
             X_pred = self._build_single_feature_row(window)
             y_pred = self.model.predict(X_pred)[0]
+            # Handle NaN predictions
+            y_pred = np.nan_to_num(y_pred, nan=0.0)
             predictions.append(y_pred)
             window.append(y_pred)
             window.pop(0)

@@ -11,7 +11,7 @@ class DataCoAdapter:
     Applies deterministic preprocessing — all stats computed on training slice only.
     """
 
-    REQUIRED_COLUMNS = ["Order Date", "Order Item Quantity", "Category Name", "Market"]
+    REQUIRED_COLUMNS = ["order date (DateOrders)", "Order Item Quantity", "Category Name", "Market"]
 
     def __init__(self, file_path: str, seed: int = 42):
         self.file_path = file_path
@@ -32,7 +32,7 @@ class DataCoAdapter:
         if missing:
             raise ValueError(f"Missing columns in DataCo dataset: {missing}")
 
-        df["Order Date"] = pd.to_datetime(df["Order Date"], errors="coerce")
+        df["Order Date"] = pd.to_datetime(df["order date (DateOrders)"], errors="coerce")
         df.dropna(subset=["Order Date", "Order Item Quantity"], inplace=True)
         df["week"] = df["Order Date"].dt.to_period("W").apply(lambda r: r.start_time)
 
@@ -45,9 +45,7 @@ class DataCoAdapter:
 
         for (category, market), grp in grouped.groupby(["Category Name", "Market"]):
             series = grp.set_index("week")["Order Item Quantity"].sort_index()
-            # Fill missing weeks with 0
-            full_index = pd.date_range(series.index.min(), series.index.max(), freq="W")
-            series = series.reindex(full_index, fill_value=0)
+            # Don't reindex to full date range — just use actual data points
             # Only keep series with enough observations
             if len(series) >= 52:
                 key = f"{category}__{market}"
