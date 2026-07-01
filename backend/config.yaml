@@ -55,7 +55,7 @@ models:
 
   lstm:
     enabled: true
-    look_back: 12
+    look_back: 8
     lstm_units: 64
     epochs: 50
     batch_size: 16

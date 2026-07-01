@@ -1,0 +1,83 @@
+{
+  "run_id": "20260701_181809",
+  "config": {
+    "seed": 42,
+    "cv_folds": 2,
+    "horizon": 4,
+    "train_ratio": 0.7,
+    "datasets": {
+      "dataco": {
+        "enabled": true,
+        "file_path": "data/raw/DataCoSupplyChainDataset.csv",
+        "n_sample_series": 1
+      },
+      "rossmann": {
+        "enabled": true,
+        "train_path": "data/raw/rossmann_train.csv",
+        "store_path": "data/raw/rossmann_store.csv",
+        "n_stores": 10,
+        "n_sample_series": 1
+      }
+    },
+    "models": {
+      "sarima": {
+        "enabled": false
+      },
+      "ets": {
+        "enabled": false
+      },
+      "prophet": {
+        "enabled": true
+      },
+      "xgboost": {
+        "enabled": false
+      },
+      "lstm": {
+        "enabled": false
+      }
+    }
+  },
+  "results": {
+    "dataco": {
+      "prophet": {
+        "MAE": {
+          "mean": 148.82965251030294,
+          "std": 0.0
+        },
+        "RMSE": {
+          "mean": 164.43952850657604,
+          "std": 0.0
+        },
+        "MAPE": {
+          "mean": 306.52872934322187,
+          "std": 0.0
+        },
+        "R2": {
+          "mean": -1127.342223807949,
+          "std": 0.0
+        }
+      }
+    },
+    "rossmann": {
+      "prophet": {
+        "MAE": {
+          "mean": 7252.718606138162,
+          "std": 0.0
+        },
+        "RMSE": {
+          "mean": 7753.677758454903,
+          "std": 0.0
+        },
+        "MAPE": {
+          "mean": 14.240128329580239,
+          "std": 0.0
+        },
+        "R2": {
+          "mean": 0.04561327609176885,
+          "std": 0.0
+        }
+      }
+    }
+  },
+  "total_time_seconds": 8.33
+}

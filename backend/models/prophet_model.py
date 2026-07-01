@@ -5,6 +5,11 @@ from models.base_forecaster import BaseForecaster
 
 warnings.filterwarnings("ignore")
 
+try:
+    from prophet import Prophet
+except ImportError as e:
+    raise ImportError(f"Prophet is required for ProphetForecaster but could not be imported: {e}")
+
 
 class ProphetForecaster(BaseForecaster):
     """
@@ -23,7 +28,6 @@ class ProphetForecaster(BaseForecaster):
         self._last_date = None
 
     def fit(self, y_train: np.ndarray) -> None:
-        from prophet import Prophet
 
         # Remove any NaN values
         y_train = np.array(y_train, dtype=float)

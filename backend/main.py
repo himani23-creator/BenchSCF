@@ -146,7 +146,9 @@ def run_benchmark_task(run_id: str, config: BenchmarkConfig):
 
             for model_name in config.models:
                 if model_name not in MODEL_REGISTRY:
-                    log(f"  Skipping unknown model: {model_name}", "warn")
+                    msg = f"Model '{model_name}' is unavailable. Please ensure the 'benchscf' conda environment is activated and dependencies are installed."
+                    log(f"  {msg}", "error")
+                    all_results[dataset_name][model_name] = {"error": msg}
                     continue
 
                 log(f"  Running {model_name} on {dataset_name}…")

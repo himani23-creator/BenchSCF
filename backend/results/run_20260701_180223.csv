@@ -1,0 +1,3 @@
+dataset,model,MAE_mean,MAE_std,RMSE_mean,RMSE_std,MAPE_mean,MAPE_std,R2_mean,R2_std
+dataco,lstm,53.3429,0.0,53.7887,0.0,227.1633,0.0,-48.1956,0.0
+rossmann,lstm,8832.5776,0.0,10530.6434,0.0,15.1784,0.0,-0.7695,0.0
